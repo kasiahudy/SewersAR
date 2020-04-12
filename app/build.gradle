@@ -25,6 +25,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.github.appoly:ARCore-Location:1.2'
     implementation "com.google.ar.sceneform.ux:sceneform-ux:1.14.0"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.2'
@@ -39,3 +40,8 @@ sceneform.asset('sampledata/Pipe.obj',
         'default',
         'sampledata/Pipe.sfa',
         'src/main/assets/Pipe')
+
+sceneform.asset('sampledata/badtz.obj',
+        'default',
+        'sampledata/badtz.sfa',
+        'src/main/assets/badtz')
