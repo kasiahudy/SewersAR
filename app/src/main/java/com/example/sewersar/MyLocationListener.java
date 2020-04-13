@@ -27,7 +27,7 @@ public class MyLocationListener implements LocationListener {
     private ArSceneView arSceneView;
     private Frame arFrame;
 
-    MyLocationListener(MainActivity mainActivity, LocationScene locationScene, ModelRenderable andyRenderable, ArSceneView arSceneView, Frame arFrame) {
+    MyLocationListener(MainActivity mainActivity, LocationScene locationScene, ModelRenderable andyRenderable, ArSceneView arSceneView) {
         this.mainActivity = mainActivity;
         this.locationScene = locationScene;
         this.andyRenderable = andyRenderable;
@@ -41,19 +41,19 @@ public class MyLocationListener implements LocationListener {
         String longitude = "Longitude: " + loc.getLongitude();
         String latitude = "Latitude: " + loc.getLatitude();
 
-
+        /*
         if (locationScene == null) {
             locationScene = new LocationScene(mainActivity, arSceneView);
             LocationMarker locationMarker = new LocationMarker(loc.getLongitude(), loc.getLatitude(), getAndy());
             locationScene.mLocationMarkers.add(locationMarker);
-            //locationMarker.anchorNode.setEnabled(true);
+            locationMarker.anchorNode.setEnabled(true);
 
-            //locationScene.refreshAnchors();
+            locationScene.refreshAnchors();
         }
 
         if (locationScene != null) {
             locationScene.processFrame(arFrame);
-        }
+        }*/
 
 
     }
