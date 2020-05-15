@@ -50,3 +50,8 @@ sceneform.asset('sampledata/models/andy.obj',
         'default',
         'sampledata/models/andy.sfa',
         'src/main/res/raw/andy')
+
+sceneform.asset('sampledata/Pipe.obj',
+        'default',
+        'sampledata/Pipe.sfa',
+        'src/main/res/raw/pipe')

@@ -41,6 +41,7 @@ import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.Color;
+import com.google.ar.sceneform.rendering.Material;
 import com.google.ar.sceneform.rendering.MaterialFactory;
 import  com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
@@ -70,6 +71,10 @@ public class MainActivity extends AppCompatActivity {
 
     private LocationManager locationManager;
     private LocationListener locationListener;
+
+    private ModelRenderable redSphereRenderable;
+    private ModelRenderable pipe;
+
 
     @Override
     @SuppressWarnings({
@@ -121,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
         } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_LOCATION);
+            //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_LOCATION);
         }*/
         LocationMarker lm1 = new LocationMarker(
                 -0.11975,
@@ -132,6 +137,24 @@ public class MainActivity extends AppCompatActivity {
                 -0.11965,
                 51.47845,
                 getAndy());
+
+        LocationMarker lm3 = new LocationMarker(
+                -0.11965,
+                51.47855,
+                getAndy());
+
+        LocationMarker lm4 = new LocationMarker(
+                -0.11975,
+                51.47845,
+                getAndy());
+
+        MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.RED))
+                .thenAccept(
+                        material -> {
+                            redSphereRenderable =
+                                    ShapeFactory.makeSphere(0.1f, new Vector3(0.0f, -1.00f, 0.0f), material); });
+
+
 
         arSceneView
                 .getScene()
@@ -150,8 +173,29 @@ public class MainActivity extends AppCompatActivity {
                                 // Adding a simple location marker of a 3D model
 
 
-                                locationScene.mLocationMarkers.add(lm1);
-                                locationScene.mLocationMarkers.add(lm2);
+                                locationScene.mLocationMarkers.add(
+                                        new LocationMarker(
+                                                -0.11975,
+                                                51.47855,
+                                                getAndy()));
+
+                                locationScene.mLocationMarkers.add(
+                                        new LocationMarker(
+                                                -0.11965,
+                                                51.47845,
+                                                getAndy()));
+
+                                locationScene.mLocationMarkers.add(
+                                        new LocationMarker(
+                                                -0.11965,
+                                                51.47855,
+                                                getAndy()));
+
+                                locationScene.mLocationMarkers.add(
+                                        new LocationMarker(
+                                                -0.11975,
+                                                51.47845,
+                                                getPipe(0.2f)));
 
 
                             }
@@ -225,13 +269,34 @@ public class MainActivity extends AppCompatActivity {
 
     private Node getAndy() {
         Node base = new Node();
-        base.setRenderable(andyRenderable );
+        base.setRenderable(redSphereRenderable );
         Context c = this;
         base.setOnTapListener((v, event) -> {
             Toast.makeText(
-                    c, "Andy touched.", Toast.LENGTH_LONG)
+                    c, "Sieć wodociągowa", Toast.LENGTH_LONG)
                     .show();
         });
+        return base;
+    }
+
+    private Node getPipe(float height) {
+        Node base = new Node();
+
+        MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.RED))
+                .thenAccept(
+                        material -> {
+                            pipe =
+                                    ShapeFactory.makeCylinder(0.1f, 0.2f, new Vector3(0.0f, -1.00f, 0.0f), material);
+                            base.setRenderable(pipe );
+
+                            Context c = this;
+                            base.setOnTapListener((v, event) -> {
+                                Toast.makeText(
+                                        c, "Sieć wodociągowa", Toast.LENGTH_LONG)
+                                        .show();
+                            });
+
+                        });
         return base;
     }
 
