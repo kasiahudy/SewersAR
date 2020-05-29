@@ -8,7 +8,7 @@ import com.example.sewersar.LocationMarker;
 //import uk.co.appoly.arcorelocation.rendering.LocationNode;
 //import uk.co.appoly.arcorelocation.rendering.LocationNodeRender;
 //import uk.co.appoly.arcorelocation.utils.ARLocationPermissionHelper;
-
+import com.example.sewersar.sensor.DeviceOrientation;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -77,7 +77,10 @@ public class MainActivity extends AppCompatActivity {
     private ModelRenderable redSphereRenderable;
     private ModelRenderable pipe;
 
-
+    float points[][] = {
+            {-0.11975f, 51.47855f},
+            {-0.11965f, 51.47845f},
+            {-0.11965f, 51.47855f}};
     @Override
     @SuppressWarnings({
             "AndroidApiChecker",
@@ -130,31 +133,12 @@ public class MainActivity extends AppCompatActivity {
         } else {
             //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_LOCATION);
         }*/
-        LocationMarker lm1 = new LocationMarker(
-                -0.11975,
-                51.47855,
-                getAndy());
-
-        LocationMarker lm2 = new LocationMarker(
-                -0.11965,
-                51.47845,
-                getAndy());
-
-        LocationMarker lm3 = new LocationMarker(
-                -0.11965,
-                51.47855,
-                getAndy());
-
-        LocationMarker lm4 = new LocationMarker(
-                -0.11975,
-                51.47845,
-                getAndy());
 
         MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.RED))
                 .thenAccept(
                         material -> {
                             redSphereRenderable =
-                                    ShapeFactory.makeSphere(0.1f, new Vector3(0.0f, -1.00f, 0.0f), material); });
+                                    ShapeFactory.makeSphere(0.1f, new Vector3(0.0f, 0.00f, 0.0f), material); });
 
 
 
@@ -177,27 +161,34 @@ public class MainActivity extends AppCompatActivity {
 
                                 locationScene.mLocationMarkers.add(
                                         new LocationMarker(
-                                                -0.11975,
-                                                51.47855,
+                                                points[0][0],
+                                                points[0][1],
                                                 getAndy()));
 
                                 locationScene.mLocationMarkers.add(
                                         new LocationMarker(
-                                                -0.11965,
-                                                51.47845,
+                                                points[1][0],
+                                                points[1][1],
                                                 getAndy()));
 
                                 locationScene.mLocationMarkers.add(
                                         new LocationMarker(
-                                                -0.11965,
-                                                51.47855,
+                                                points[2][0],
+                                                points[2][1],
                                                 getAndy()));
 
+                                float newLon = (points[0][0] + points[2][0])/2;
+                                float newLat = (points[0][1] + points[2][1])/2;
+                                float newHeight = measure(points[0][1], points[0][0], points[2][1], points[2][0])/7;
+                                float newX = points[0][0] - points[2][0];
+                                float newY = points[0][1] - points[2][1];
+                                float beta = (float)(Math.atan(newY/newX) * 180/Math.PI);
+                                float o = locationScene.deviceOrientation.getOrientation();
                                 locationScene.mLocationMarkers.add(
                                         new LocationMarker(
-                                                -0.11975,
-                                                51.47845,
-                                                getPipe(0.2f)));
+                                                newLon,
+                                                newLat,
+                                                getPipe(newHeight, 80.0f)));
 
 
                             }
@@ -269,9 +260,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private float measure(float lat1, float lon1, float lat2, float lon2){  // generally used geo measurement function
+        float R = 6378.137f; // Radius of earth in KM
+        double dLat = lat2 * Math.PI / 180 - lat1 * Math.PI / 180;
+        double dLon = lon2 * Math.PI / 180 - lon1 * Math.PI / 180;
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                        Math.sin(dLon/2) * Math.sin(dLon/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double d = R * c;
+        return (float)d * 1000; // meters
+    }
+
     private Node getAndy() {
         Node base = new Node();
-        base.setRenderable(andyRenderable );
+        base.setRenderable(redSphereRenderable );
         Context c = this;
         base.setOnTapListener((v, event) -> {
             Toast.makeText(
@@ -281,18 +284,18 @@ public class MainActivity extends AppCompatActivity {
         return base;
     }
 
-    private Node getPipe(float height) {
+    private Node getPipe(float height, float angle) {
         Node base = new Node();
 
         MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.RED))
                 .thenAccept(
                         material -> {
                             pipe =
-                                    ShapeFactory.makeCylinder(0.1f, 0.2f, new Vector3(0.0f, -1.00f, 0.0f), material);
+                                    ShapeFactory.makeCylinder(0.1f, height, new Vector3(0.0f, 0.00f, 0.0f), material);
 
 
                             base.setRenderable(pipe );
-                            Quaternion lookRotation = Quaternion.axisAngle(new Vector3(0.0f, 0.0f, 1.0f), 45);
+                            Quaternion lookRotation = Quaternion.eulerAngles (new Vector3(angle, 0.0f, -90.0f));
                             base.setWorldRotation(lookRotation);
                             Context c = this;
                             base.setOnTapListener((v, event) -> {
