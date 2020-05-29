@@ -3,11 +3,12 @@ package com.example.sewersar;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import uk.co.appoly.arcorelocation.LocationMarker;
-import uk.co.appoly.arcorelocation.LocationScene;
-import uk.co.appoly.arcorelocation.rendering.LocationNode;
-import uk.co.appoly.arcorelocation.rendering.LocationNodeRender;
-import uk.co.appoly.arcorelocation.utils.ARLocationPermissionHelper;
+import com.example.sewersar.LocationMarker;
+//import uk.co.appoly.arcorelocation.LocationScene;
+//import uk.co.appoly.arcorelocation.rendering.LocationNode;
+//import uk.co.appoly.arcorelocation.rendering.LocationNodeRender;
+//import uk.co.appoly.arcorelocation.utils.ARLocationPermissionHelper;
+
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 import 	android.widget.Toast;
 import 	android.content.Context;
 
+import com.example.sewersar.utils.ARLocationPermissionHelper;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Config;
@@ -269,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Node getAndy() {
         Node base = new Node();
-        base.setRenderable(redSphereRenderable );
+        base.setRenderable(andyRenderable );
         Context c = this;
         base.setOnTapListener((v, event) -> {
             Toast.makeText(
@@ -287,8 +289,11 @@ public class MainActivity extends AppCompatActivity {
                         material -> {
                             pipe =
                                     ShapeFactory.makeCylinder(0.1f, 0.2f, new Vector3(0.0f, -1.00f, 0.0f), material);
-                            base.setRenderable(pipe );
 
+
+                            base.setRenderable(pipe );
+                            Quaternion lookRotation = Quaternion.axisAngle(new Vector3(0.0f, 0.0f, 1.0f), 45);
+                            base.setWorldRotation(lookRotation);
                             Context c = this;
                             base.setOnTapListener((v, event) -> {
                                 Toast.makeText(
