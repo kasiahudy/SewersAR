@@ -14,6 +14,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.sewersar.utils.LocationUtils;
 import com.google.ar.core.Frame;
 import com.google.ar.core.Session;
 import com.google.ar.core.TrackingState;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationScene locationScene;
 
 
-    private ModelRenderable redSphereRenderable;
+    private ModelRenderable sewersNode;
     private ModelRenderable pipe;
 
     private DeviceOrientation dOrientation;
@@ -52,9 +53,15 @@ public class MainActivity extends AppCompatActivity {
     //18.5729852, 54.3517485
     //18.5729322, 54.3517360
     float points[][] = {
-            {18.57305f, 54.35175f},
-            {18.57295f, 54.3517f},
-            {18.57305f, 54.35165f}};
+            {18.57302f, 54.35172f},
+            {18.5725f, 54.35175f},
+            {18.57307f, 54.35169f},
+
+            {18.57305f, 54.3519f},
+            {18.57315f, 54.3519f},
+
+            {18.57292f, 54.3517f},
+            {18.5729f, 54.35176f}};
     /*float points[][] = {
             {18.5730080f, 54.3517372f},
             {18.5729852f, 54.3517485f},
@@ -102,11 +109,11 @@ public class MainActivity extends AppCompatActivity {
                             return null;
                         });
 
-        MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.RED))
+        /*MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.RED))
                 .thenAccept(
                         material -> {
-                            redSphereRenderable =
-                                    ShapeFactory.makeSphere(0.1f, new Vector3(0.0f, 0.00f, 0.0f), material); });
+                            sewersNode =
+                                    ShapeFactory.makeSphere(0.1f, new Vector3(0.0f, 0.00f, 0.0f), material); });*/
 
         arSceneView
                 .getScene()
@@ -127,21 +134,52 @@ public class MainActivity extends AppCompatActivity {
                                         new LocationMarker(
                                                 points[0][0],
                                                 points[0][1],
-                                                getAndy()));
+                                                getSewersNode(new Color(android.graphics.Color.RED))));
 
                                 locationScene.mLocationMarkers.add(
                                         new LocationMarker(
                                                 points[1][0],
                                                 points[1][1],
-                                                getAndy()));
+                                                getSewersNode(new Color(android.graphics.Color.RED))));
 
                                 locationScene.mLocationMarkers.add(
                                         new LocationMarker(
                                                 points[2][0],
                                                 points[2][1],
-                                                getAndy()));
+                                                getSewersNode(new Color(android.graphics.Color.RED))));
 
-                                addPipe(points[0][1], points[0][0], points[2][1], points[2][0]);
+                                //addPipe(points[0][1], points[0][0], points[2][1], points[2][0], new Color(android.graphics.Color.RED));
+
+
+                                locationScene.mLocationMarkers.add(
+                                        new LocationMarker(
+                                                points[3][0],
+                                                points[3][1],
+                                                getSewersNode(new Color(android.graphics.Color.BLUE))));
+
+                                locationScene.mLocationMarkers.add(
+                                        new LocationMarker(
+                                                points[4][0],
+                                                points[4][1],
+                                                getSewersNode(new Color(android.graphics.Color.BLUE))));
+
+                                //addPipe(points[3][1], points[3][0], points[4][1], points[4][0], new Color(android.graphics.Color.BLUE));
+
+
+                                locationScene.mLocationMarkers.add(
+                                        new LocationMarker(
+                                                points[5][0],
+                                                points[5][1],
+                                                getSewersNode(new Color(android.graphics.Color.YELLOW))));
+
+                                locationScene.mLocationMarkers.add(
+                                        new LocationMarker(
+                                                points[6][0],
+                                                points[6][1],
+                                                getSewersNode(new Color(android.graphics.Color.YELLOW))));
+
+                                //addPipe(points[5][1], points[5][0], points[6][1], points[6][0], new Color(android.graphics.Color.YELLOW));
+
 
                             }
 
@@ -174,18 +212,23 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void addPipe(double lat1, double lon1, double lat2, double lon2) {
+    private void addPipe(double lat1, double lon1, double lat2, double lon2, Color pipeColor) {
         double newLon = (lon1 + lon2)/2;
         double newLat = (lat1 + lat2)/2;
-        float newDistance = measureDistance(lat1, lon1, lat2, lon2)/3;
-        double bearing = countBearing(lat1, lon1, lat2, lon2);
+        float newDistance = measureDistance(lat1, lon1, lat2, lon2);
+        double bearing = LocationUtils.bearing(lat1, lon1, lat2, lon2);
         double currentOrientation = dOrientation.getOrientation();
-        float angle = (float)(currentOrientation + bearing + 90.0);
+        if(bearing < 90.0) {
+            bearing += 90.0;
+        } else if(bearing > 270.0) {
+            bearing -= 270.0;
+        }
+        float angle = (float)(currentOrientation + bearing);
         locationScene.mLocationMarkers.add(
                 new LocationMarker(
                         newLon,
                         newLat,
-                        getPipe(newDistance, angle, locationScene)));
+                        getPipe(newDistance, angle, pipeColor, locationScene)));
     }
 
     private double countBearing(double lat1, double lon1, double lat2, double lon2) {
@@ -210,22 +253,39 @@ public class MainActivity extends AppCompatActivity {
         return (float)d * 1000; // meters
     }
 
-    private Node getAndy() {
+    private Node getSewersNode(Color nodeColor) {
         Node base = new Node();
-        base.setRenderable(redSphereRenderable );
+        MaterialFactory.makeOpaqueWithColor(this, nodeColor)
+                .thenAccept(
+                        material -> {
+                            sewersNode =
+                                    ShapeFactory.makeSphere(0.1f, new Vector3(0.0f, 0.00f, 0.0f), material);
+
+
+                            base.setRenderable(sewersNode );
+                            Context c = this;
+                            base.setOnTapListener((v, event) -> {
+                                Toast.makeText(
+                                        c, "Węzeł sieci", Toast.LENGTH_LONG)
+                                        .show();
+                            });
+
+                        });
+
+        /*base.setRenderable(sewersNode );
         Context c = this;
         base.setOnTapListener((v, event) -> {
             Toast.makeText(
                     c, "Węzeł sieci", Toast.LENGTH_LONG)
                     .show();
-        });
+        });*/
         return base;
     }
 
-    private Node getPipe(float height, float angle, LocationScene o) {
+    private Node getPipe(float height, float angle, Color pipeColor, LocationScene o) {
         Node base = new Node();
 
-        MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.RED))
+        MaterialFactory.makeOpaqueWithColor(this, pipeColor)
                 .thenAccept(
                         material -> {
                             pipe =
@@ -235,10 +295,11 @@ public class MainActivity extends AppCompatActivity {
                             base.setRenderable(pipe );
                             Quaternion lookRotation = Quaternion.eulerAngles (new Vector3(0.0f, angle,-90.0f));
                             base.setWorldRotation(lookRotation);
+                            //base.setLocalPosition(new Vector3(0.0f, -3.00f, 0.0f));
                             Context c = this;
                             base.setOnTapListener((v, event) -> {
                                 Toast.makeText(
-                                        c, "orientation: " + o.deviceOrientation.getOrientation(), Toast.LENGTH_LONG)
+                                        c, "orientation: " + o.deviceOrientation.getOrientation() + "\n dlugosc: " + height, Toast.LENGTH_LONG)
                                         .show();
                             });
 

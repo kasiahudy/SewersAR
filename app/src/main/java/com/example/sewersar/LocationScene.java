@@ -10,6 +10,12 @@ import com.google.ar.core.Pose;
 import com.google.ar.core.Session;
 import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.math.Vector3;
+import com.google.ar.sceneform.math.Quaternion;
+import com.google.ar.sceneform.rendering.Color;
+import com.google.ar.sceneform.rendering.MaterialFactory;
+import com.google.ar.sceneform.rendering.ModelRenderable;
+import com.google.ar.sceneform.rendering.ShapeFactory;
+import com.google.ar.sceneform.Node;
 
 import java.util.ArrayList;
 
@@ -351,6 +357,45 @@ public class LocationScene {
                 e.printStackTrace();
             }
         }
+
+
+        final LocationMarker marker = mLocationMarkers.get(0);
+        final LocationMarker marker2 = mLocationMarkers.get(2);
+
+        marker.anchorNode.setParent(mArSceneView.getScene());
+        Vector3 point1, point2;
+        point1 = marker.anchorNode.getWorldPosition();
+        point2 = marker2.anchorNode.getWorldPosition();
+
+    /*
+        First, find the vector extending between the two points and define a look rotation
+        in terms of this Vector.
+    */
+        final Vector3 difference = Vector3.subtract(point1, point2);
+        final Vector3 directionFromTopToBottom = difference.normalized();
+        final Quaternion rotationFromAToB =
+                Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
+        MaterialFactory.makeOpaqueWithColor(context, new Color(255, 0, 0))
+                .thenAccept(
+                        material -> {
+                            ModelRenderable model = ShapeFactory.makeCylinder(0.1f, difference.length(),
+                                    new Vector3(0f, 0f, 0f), material);
+                            model.setShadowReceiver(false);
+                            model.setShadowCaster(false);
+
+                            // 3. make node
+                            Node node = new Node();
+
+                            node.setParent(marker.anchorNode);
+                            node.setRenderable(model);
+
+                            node.setWorldPosition(Vector3.add(point1, point2).scaled(.5f));
+                            // 4. set rotation
+                            node.setWorldRotation(Quaternion.multiply(rotationFromAToB,
+                                    Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), 90)));
+                        }
+                );
+
         //this is bad, you should feel bad
         System.gc();
     }

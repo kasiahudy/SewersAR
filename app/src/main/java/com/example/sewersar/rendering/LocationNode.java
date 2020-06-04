@@ -38,7 +38,7 @@ public class LocationNode extends AnchorNode {
     }
 
     public float getHeight() {
-        return height;
+        return height - 2.0f;
     }
 
     public void setHeight(float height) {
@@ -223,7 +223,7 @@ public class LocationNode extends AnchorNode {
             n.setWorldPosition(new Vector3(n.getWorldPosition().x, getHeight(), n.getWorldPosition().z));
             Quaternion lookRotation = Quaternion.lookRotation(direction, Vector3.up());
             //n.setWorldRotation(lookRotation);
-            n.setWorldScale(new Vector3(scale, scale, scale));
+            //n.setWorldScale(new Vector3(scale, scale, scale));
         }
     }
 
