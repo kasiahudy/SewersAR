@@ -77,10 +77,20 @@ public class MainActivity extends AppCompatActivity {
     private ModelRenderable redSphereRenderable;
     private ModelRenderable pipe;
 
+    private DeviceOrientation dOrientation;
+
+    //18.5730080, 54.3517372
+    //18.5729852, 54.3517485
+    //18.5729322, 54.3517360
     float points[][] = {
-            {-0.11975f, 51.47855f},
-            {-0.11965f, 51.47845f},
-            {-0.11965f, 51.47855f}};
+            {18.57305f, 54.35175f},
+            {18.57295f, 54.3517f},
+            {18.57305f, 54.35165f}};
+    /*float points[][] = {
+            {18.5730080f, 54.3517372f},
+            {18.5729852f, 54.3517485f},
+            {18.5731256f, 54.3517114f}
+    };*/
     @Override
     @SuppressWarnings({
             "AndroidApiChecker",
@@ -90,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
         //if (!checkIsSupportedDeviceOrFinish(this)) {
             //return;
        // }
+        dOrientation = new DeviceOrientation(this);
+        dOrientation.resume();
 
         setContentView(R.layout.activity_sceneform);
         arSceneView = findViewById(R.id.ar_scene_view);
@@ -177,19 +189,30 @@ public class MainActivity extends AppCompatActivity {
                                                 points[2][1],
                                                 getAndy()));
 
-                                float newLon = (points[0][0] + points[2][0])/2;
-                                float newLat = (points[0][1] + points[2][1])/2;
-                                float newHeight = measure(points[0][1], points[0][0], points[2][1], points[2][0])/7;
+                                double newLon = (points[0][0] + points[2][0])/2;
+                                double newLat = (points[0][1] + points[2][1])/2;
+                                float newHeight = measure(points[0][1], points[0][0], points[2][1], points[2][0])/2;
                                 float newX = points[0][0] - points[2][0];
                                 float newY = points[0][1] - points[2][1];
                                 float beta = (float)(Math.atan(newY/newX) * 180/Math.PI);
+
+
+                                double lat1 = points[0][1];
+                                double lat2 = points[2][1];
+                                double dLon = Math.abs(points[0][0] - points[2][0]);
+                                double y2 = Math.sin(dLon) * Math.cos(lat2);
+                                double x2 = Math.cos(lat1)*Math.sin(lat2) -
+                                        Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
+                                double brng = Math.toDegrees(Math.atan2(y2, x2));
                                 float o = locationScene.deviceOrientation.getOrientation();
+                                double o2 = dOrientation.getOrientation();
+                                float angle = (float)(o2+brng+90.0);
                                 locationScene.mLocationMarkers.add(
                                         new LocationMarker(
                                                 newLon,
                                                 newLat,
-                                                getPipe(newHeight, 80.0f)));
-
+                                                getPipe(newHeight, angle, locationScene)));
+                                int x = 0;
 
                             }
 
@@ -219,46 +242,9 @@ public class MainActivity extends AppCompatActivity {
         // Lastly request CAMERA & fine location permission which is required by ARCore-Location.
         ARLocationPermissionHelper.requestPermission(this);
 
-        /*arFragment.setOnTapArPlaneListener(
-                (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
-                    if (andyRenderable == null) {
-                        return;
-                    }
-
-                    // Create the Anchor.
-                    Anchor anchor = hitResult.createAnchor();
-                    AnchorNode anchorNode = new AnchorNode(anchor);
-                    anchorNode.setParent(arFragment.getArSceneView().getScene());
-
-                    // Create the transformable andy and add it to the anchor.
-                    TransformableNode andy2 = new TransformableNode(arFragment.getTransformationSystem());
-                    andy2.setParent(anchorNode);
-                    andy2.setRenderable(andyRenderable);
-                    andy2.select();
-                });
-*/
-
-        /*arSceneView
-                .getScene()
-                .addOnUpdateListener(
-                        frameTime -> {
-
-                            if (locationScene == null) {
-                                locationScene = new LocationScene(this, arSceneView);
-                                locationScene.mLocationMarkers.add(
-                                        new LocationMarker(
-                                                18.5729,
-                                                54.3516,
-                                                getAndy()));
-                            }
-
-                            if (locationScene != null) {
-                                locationScene.processFrame(arFrame);
-                            }
-
-                        });*/
 
     }
+
 
     private float measure(float lat1, float lon1, float lat2, float lon2){  // generally used geo measurement function
         float R = 6378.137f; // Radius of earth in KM
@@ -278,13 +264,13 @@ public class MainActivity extends AppCompatActivity {
         Context c = this;
         base.setOnTapListener((v, event) -> {
             Toast.makeText(
-                    c, "Sieć wodociągowa", Toast.LENGTH_LONG)
+                    c, "Węzeł sieci", Toast.LENGTH_LONG)
                     .show();
         });
         return base;
     }
 
-    private Node getPipe(float height, float angle) {
+    private Node getPipe(float height, float angle, LocationScene o) {
         Node base = new Node();
 
         MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.RED))
@@ -295,40 +281,18 @@ public class MainActivity extends AppCompatActivity {
 
 
                             base.setRenderable(pipe );
-                            Quaternion lookRotation = Quaternion.eulerAngles (new Vector3(angle, 0.0f, -90.0f));
+                            Quaternion lookRotation = Quaternion.eulerAngles (new Vector3(0.0f, angle,-90.0f));
                             base.setWorldRotation(lookRotation);
                             Context c = this;
                             base.setOnTapListener((v, event) -> {
                                 Toast.makeText(
-                                        c, "Sieć wodociągowa", Toast.LENGTH_LONG)
+                                        c, "orientation: " + o.deviceOrientation.getOrientation(), Toast.LENGTH_LONG)
                                         .show();
                             });
 
                         });
         return base;
     }
-
-    /*public static boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            Log.e(TAG, "Sceneform requires Android N or later");
-            Toast.makeText(activity, "Sceneform requires Android N or later",
-                    Toast.LENGTH_LONG).show();
-            activity.finish();
-            return false;    }
-        String openGlVersionString = ((ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE))
-                .getDeviceConfigurationInfo()
-                .getGlEsVersion();
-        if (Double.parseDouble(openGlVersionString) < MIN_OPENGL_VERSION) {
-            Log.e(TAG, "Sceneform requires OpenGL ES 3.0 later");
-            Toast.makeText(activity, "Sceneform requires OpenGL ES 3.0 or later",
-                    Toast.LENGTH_LONG)
-                    .show();
-            activity.finish();
-            return false;
-        }
-        return true;
-    }*/
-
 
     @Override
     protected void onResume() {
@@ -342,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
             // If the session wasn't created yet, don't resume rendering.
             // This can happen if ARCore needs to be updated or permissions are not granted yet.
             try {
-                Session session = MainActivity.createArSession(this, installRequested);
+                Session session = DemoUtils.createArSession(this, installRequested);
                 if (session == null) {
                     installRequested = ARLocationPermissionHelper.hasPermission(this);
                     return;
@@ -350,14 +314,14 @@ public class MainActivity extends AppCompatActivity {
                     arSceneView.setupSession(session);
                 }
             } catch (UnavailableException e) {
-                //DemoUtils.handleSessionException(this, e);
+                DemoUtils.handleSessionException(this, e);
             }
         }
 
         try {
             arSceneView.resume();
         } catch (CameraNotAvailableException ex) {
-            //DemoUtils.displayError(this, "Unable to get camera", ex);
+            DemoUtils.displayError(this, "Unable to get camera", ex);
             finish();
             return;
         }
@@ -416,25 +380,5 @@ public class MainActivity extends AppCompatActivity {
                                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
-    }
-
-    public static Session createArSession(Activity activity, boolean installRequested)
-            throws UnavailableException {
-        Session session = null;
-        // if we have the camera permission, create the session
-        if (ARLocationPermissionHelper.hasPermission(activity)) {
-            switch (ArCoreApk.getInstance().requestInstall(activity, !installRequested)) {
-                case INSTALL_REQUESTED:
-                    return null;
-                case INSTALLED:
-                    break;
-            }
-            session = new Session(activity);
-            // IMPORTANT!!!  ArSceneView needs to use the non-blocking update mode.
-            Config config = new Config(session);
-            config.setUpdateMode(Config.UpdateMode.LATEST_CAMERA_IMAGE);
-            session.configure(config);
-        }
-        return session;
     }
 }

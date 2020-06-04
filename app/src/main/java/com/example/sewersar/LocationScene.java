@@ -325,7 +325,7 @@ public class LocationScene {
 
                 marker.anchorNode.setParent(mArSceneView.getScene());
                 marker.anchorNode.addChild(mLocationMarkers.get(i).node);
-                marker.node.setLocalPosition(Vector3.zero());
+                //marker.node.setLocalPosition(Vector3.zero());
 
                 if (marker.getRenderEvent() != null) {
                     marker.anchorNode.setRenderEvent(marker.getRenderEvent());
