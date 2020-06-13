@@ -55,9 +55,9 @@ public class MainActivity extends AppCompatActivity {
     float points[][] = {
             {18.57302f, 54.35172f},
             {18.5725f, 54.35175f},
-            {18.57307f, 54.35169f},
+            {18.57303f, 54.351715f},
 
-            {18.57305f, 54.3519f},
+            {18.57305f, 54.35171f},
             {18.57315f, 54.3519f},
 
             {18.57292f, 54.3517f},
@@ -194,6 +194,39 @@ public class MainActivity extends AppCompatActivity {
 
                             if (locationScene != null) {
                                 locationScene.processFrame(frame);
+
+                                /*final LocationMarker marker = locationScene.mLocationMarkers.get(0);
+                                final LocationMarker marker2 = locationScene.mLocationMarkers.get(2);
+
+                                marker.anchorNode.setParent(arSceneView.getScene());
+                                Vector3 point1, point2;
+                                point1 = marker.anchorNode.getWorldPosition();
+                                point2 = marker2.anchorNode.getWorldPosition();
+
+                                final Vector3 difference = Vector3.subtract(point1, point2);
+                                final Vector3 directionFromTopToBottom = difference.normalized();
+                                final Quaternion rotationFromAToB =
+                                        Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
+                                MaterialFactory.makeOpaqueWithColor(this, new Color(255, 0, 0))
+                                        .thenAccept(
+                                                material -> {
+                                                    ModelRenderable model = ShapeFactory.makeCylinder(0.1f, difference.length(),
+                                                            new Vector3(0f, 0f, 0f), material);
+                                                    model.setShadowReceiver(false);
+                                                    model.setShadowCaster(false);
+
+                                                    // 3. make node
+                                                    Node node = new Node();
+
+                                                    node.setParent(marker.anchorNode);
+                                                    node.setRenderable(model);
+
+                                                    node.setWorldPosition(Vector3.add(point1, point2).scaled(.5f));
+                                                    // 4. set rotation
+                                                    node.setWorldRotation(Quaternion.multiply(rotationFromAToB,
+                                                            Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), 90)));
+                                                }
+                                        );*/
                             }
 
                             /*if (loadingMessageSnackbar != null) {

@@ -1,8 +1,10 @@
 package com.example.sewersar;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Frame;
@@ -359,18 +361,19 @@ public class LocationScene {
         }
 
 
-        final LocationMarker marker = mLocationMarkers.get(0);
-        final LocationMarker marker2 = mLocationMarkers.get(2);
+        createPipe(mLocationMarkers.get(0), mLocationMarkers.get(2));
+        createPipe(mLocationMarkers.get(2), mLocationMarkers.get(3));
+
+        System.gc();
+    }
+
+    private void createPipe(final LocationMarker marker, final LocationMarker marker2) {
 
         marker.anchorNode.setParent(mArSceneView.getScene());
         Vector3 point1, point2;
         point1 = marker.anchorNode.getWorldPosition();
         point2 = marker2.anchorNode.getWorldPosition();
 
-    /*
-        First, find the vector extending between the two points and define a look rotation
-        in terms of this Vector.
-    */
         final Vector3 difference = Vector3.subtract(point1, point2);
         final Vector3 directionFromTopToBottom = difference.normalized();
         final Quaternion rotationFromAToB =
@@ -388,16 +391,19 @@ public class LocationScene {
 
                             node.setParent(marker.anchorNode);
                             node.setRenderable(model);
-
-                            node.setWorldPosition(Vector3.add(point1, point2).scaled(.5f));
+                            Vector3 xxx = Vector3.add(point1, point2).scaled(.5f);
+                            node.setWorldPosition(xxx);
                             // 4. set rotation
                             node.setWorldRotation(Quaternion.multiply(rotationFromAToB,
                                     Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), 90)));
+                            Context c = this.context;
+                            node.setOnTapListener((v, event) -> {
+                                Toast.makeText(
+                                        c, "dlugosc: " + difference.length(), Toast.LENGTH_LONG)
+                                        .show();
+                            });
                         }
                 );
-
-        //this is bad, you should feel bad
-        System.gc();
     }
 
     /**
