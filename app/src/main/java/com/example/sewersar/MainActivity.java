@@ -1,5 +1,7 @@
 package com.example.sewersar;
 
+import com.example.sewersar.database.SewersARViewModel;
+import com.example.sewersar.database.SewersNode;
 import com.example.sewersar.sensor.DeviceOrientation;
 import com.example.sewersar.utils.ARLocationPermissionHelper;
 
@@ -12,7 +14,10 @@ import android.widget.Toast;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.sewersar.utils.LocationUtils;
 import com.google.ar.core.Frame;
@@ -29,6 +34,7 @@ import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.ArSceneView;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -48,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
     private ModelRenderable pipe;
 
     private DeviceOrientation dOrientation;
+
+    private SewersARViewModel mSewersARViewModel;
+    List<SewersNode> sewersNodes;
 
     //18.5730080, 54.3517372
     //18.5729852, 54.3517485
@@ -79,6 +88,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sceneform);
         arSceneView = findViewById(R.id.ar_scene_view);
 
+        mSewersARViewModel = new ViewModelProvider(this).get(SewersARViewModel.class);
+        mSewersARViewModel.getAllNodes().observe(this, new Observer<List<SewersNode>>() {
+            @Override
+            public void onChanged(@Nullable final List<SewersNode> newSewersNodes) {
+                sewersNodes = newSewersNodes;
+            }
+        });
 
         CompletableFuture<ModelRenderable> andy = ModelRenderable.builder()
                 .setSource(this, R.raw.andy)
@@ -130,7 +146,14 @@ public class MainActivity extends AppCompatActivity {
 
                                 // Adding a simple location marker of a 3D model
 
-                                locationScene.mLocationMarkers.add(
+                                for (int i = 0; i < sewersNodes.size(); i++) {
+                                    locationScene.mLocationMarkers.add(
+                                            new LocationMarker(
+                                                    sewersNodes.get(i).lon,
+                                                    sewersNodes.get(i).lat,
+                                                    getSewersNode(new Color(android.graphics.Color.RED))));
+                                }
+                                /*locationScene.mLocationMarkers.add(
                                         new LocationMarker(
                                                 points[0][0],
                                                 points[0][1],
@@ -178,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                                                 points[6][1],
                                                 getSewersNode(new Color(android.graphics.Color.YELLOW))));
 
-                                //addPipe(points[5][1], points[5][0], points[6][1], points[6][0], new Color(android.graphics.Color.YELLOW));
+                                //addPipe(points[5][1], points[5][0], points[6][1], points[6][0], new Color(android.graphics.Color.YELLOW));*/
 
 
                             }
