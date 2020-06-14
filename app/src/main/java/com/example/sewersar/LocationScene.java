@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.sewersar.database.SewersPipe;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Frame;
 import com.google.ar.core.Pose;
@@ -20,6 +21,7 @@ import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.Node;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.example.sewersar.rendering.LocationNode;
 import com.example.sewersar.sensor.DeviceLocation;
@@ -65,12 +67,13 @@ public class LocationScene {
     private Session mSession;
     private DeviceLocationChanged locationChangedEvent;
 
-    private ModelRenderable pipeModel;
+    private List<SewersPipe> sewersPipes;
 
-    public LocationScene(Activity context, ArSceneView mArSceneView) {
+    public LocationScene(Activity context, ArSceneView mArSceneView, List<SewersPipe> mSewersPipes) {
         this.context = context;
         this.mSession = mArSceneView.getSession();
         this.mArSceneView = mArSceneView;
+        this.sewersPipes = mSewersPipes;
 
         startCalculationTask();
 
@@ -78,19 +81,6 @@ public class LocationScene {
         deviceOrientation = new DeviceOrientation(context);
         deviceOrientation.resume();
 
-        MaterialFactory.makeOpaqueWithColor(context, new Color(255, 0, 0))
-                .thenAccept(
-                        material -> {
-                            pipeModel = ShapeFactory.makeCylinder(0.1f, 2.0f,
-                                    new Vector3(0f, 0f, 0f), material);
-                            //pipeModel.setShadowReceiver(false);
-                            //pipeModel.setShadowCaster(false);
-
-
-
-
-                        }
-                );
         //test();
     }
 
@@ -376,76 +366,11 @@ public class LocationScene {
             }
         }
 
-        /*Node marker = mLocationMarkers.get(0).anchorNode;
-        Node marker2 = mLocationMarkers.get(2).anchorNode;
-        marker.setParent(mArSceneView.getScene());
-        Vector3 point1, point2;
-        point1 = marker.getWorldPosition();
-        point2 = marker2.getWorldPosition();
-
-        final Vector3 difference = Vector3.subtract(point1, point2);
-        final Vector3 directionFromTopToBottom = difference.normalized();
-        final Quaternion rotationFromAToB =
-                Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
-
-        Node node = new Node();
-        node.setParent(marker);
-        Vector3 xxx = Vector3.add(point1, point2).scaled(.5f);
-        node.setWorldPosition(xxx);
-        //node.setWorldRotation(Quaternion.multiply(rotationFromAToB,
-                //Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), 90)));
-
-        createPipe3(marker, node, marker);
-
-        createPipe3(marker2, node, marker);*/
-        createPipe(mLocationMarkers.get(0).anchorNode, mLocationMarkers.get(2).anchorNode);
+        for(int i = 0; i < sewersPipes.size(); i++) {
+            createPipe(mLocationMarkers.get(sewersPipes.get(i).startNodeIndex).anchorNode, mLocationMarkers.get(sewersPipes.get(i).endNodeIndex).anchorNode);
+        }
 
         System.gc();
-    }
-
-    private void createPipe3(final Node marker, final Node marker2, final Node parent) {
-        marker.setParent(mArSceneView.getScene());
-        Vector3 point1, point2;
-        point1 = marker.getWorldPosition();
-        point2 = marker2.getWorldPosition();
-
-        final Vector3 difference = Vector3.subtract(point1, point2);
-        final Vector3 directionFromTopToBottom = difference.normalized();
-        final Quaternion rotationFromAToB =
-                Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
-
-        Node node = new Node();
-        node.setParent(marker);
-        Vector3 xxx = Vector3.add(point1, point2).scaled(.5f);
-        node.setWorldPosition(xxx);
-        //node.setWorldRotation(Quaternion.multiply(rotationFromAToB,
-        //Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), 90)));
-
-        createPipe2(marker, node, marker);
-
-        createPipe2(marker2, node, marker);
-
-    }
-
-    private void createPipe2(final Node marker, final Node marker2, final Node parent) {
-        marker.setParent(mArSceneView.getScene());
-        Vector3 point1, point2;
-        point1 = marker.getWorldPosition();
-        point2 = marker2.getWorldPosition();
-
-        final Vector3 difference = Vector3.subtract(point1, point2);
-        final Vector3 directionFromTopToBottom = difference.normalized();
-        final Quaternion rotationFromAToB =
-                Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
-
-        Node node = new Node();
-        node.setParent(parent);
-        Vector3 xxx = Vector3.add(point1, point2).scaled(.5f);
-        node.setWorldPosition(xxx);
-        node.setWorldRotation(Quaternion.multiply(rotationFromAToB,
-                Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), 90)));
-        node.setRenderable(pipeModel);
-
     }
 
     private void createPipe(final Node marker, final Node marker2) {

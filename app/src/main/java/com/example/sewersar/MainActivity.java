@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                             if (locationScene == null) {
                                 // If our locationScene object hasn't been setup yet, this is a good time to do it
                                 // We know that here, the AR components have been initiated.
-                                locationScene = new LocationScene(this, arSceneView);
+                                locationScene = new LocationScene(this, arSceneView, sewersPipes);
 
                                 // Adding a simple location marker of a 3D model
                                 SewersPipe sp = sewersPipes.get(0);
