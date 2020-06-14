@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey;
 
 @Entity (tableName = "SewersNode")
 public class SewersNode {
+
     @PrimaryKey
     @NonNull
     @ColumnInfo(name = "index")

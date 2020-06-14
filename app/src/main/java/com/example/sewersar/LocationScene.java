@@ -11,6 +11,7 @@ import com.google.ar.core.Anchor;
 import com.google.ar.core.Frame;
 import com.google.ar.core.Pose;
 import com.google.ar.core.Session;
+import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.math.Quaternion;
@@ -373,7 +374,7 @@ public class LocationScene {
         System.gc();
     }
 
-    private void createPipe(final Node marker, final Node marker2) {
+    private void createPipe(final AnchorNode marker, final AnchorNode  marker2) {
         marker.setParent(mArSceneView.getScene());
         Vector3 point1, point2;
         point1 = marker.getWorldPosition();
@@ -399,8 +400,12 @@ public class LocationScene {
 
                             node.setWorldPosition(Vector3.add(point1, point2).scaled(.5f));
                             // 4. set rotation
-                            node.setWorldRotation(Quaternion.multiply(rotationFromAToB,
-                                    Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), 90)));
+                            Vector3 vector = Vector3.subtract(point2, point1);
+                            Quaternion lookRotation = Quaternion.lookRotation(vector, Vector3.up());
+                            lookRotation.z = 0;
+                            lookRotation.x = 0;
+                            Quaternion worldRotation = Quaternion.multiply(lookRotation, Quaternion.axisAngle(Vector3.left(), 90));
+                            node.setWorldRotation(worldRotation);
                         }
                 );
     }

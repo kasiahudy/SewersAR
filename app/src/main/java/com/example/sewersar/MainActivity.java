@@ -6,8 +6,6 @@ import com.example.sewersar.database.SewersPipe;
 import com.example.sewersar.sensor.DeviceOrientation;
 import com.example.sewersar.utils.ARLocationPermissionHelper;
 
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -36,8 +34,10 @@ import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.ArSceneView;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,24 +60,6 @@ public class MainActivity extends AppCompatActivity {
     List<SewersNode> sewersNodes;
     List<SewersPipe> sewersPipes;
 
-    //18.5730080, 54.3517372
-    //18.5729852, 54.3517485
-    //18.5729322, 54.3517360
-    float points[][] = {
-            {18.57302f, 54.35172f},
-            {18.5725f, 54.35175f},
-            {18.57303f, 54.351715f},
-
-            {18.57305f, 54.35171f},
-            {18.57315f, 54.3519f},
-
-            {18.57292f, 54.3517f},
-            {18.5729f, 54.35176f}};
-    /*float points[][] = {
-            {18.5730080f, 54.3517372f},
-            {18.5729852f, 54.3517485f},
-            {18.5731256f, 54.3517114f}
-    };*/
     @Override
     @SuppressWarnings({
             "AndroidApiChecker",
@@ -155,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 // Adding a simple location marker of a 3D model
                                 SewersPipe sp = sewersPipes.get(0);
+                                //increaseAccuracy();
                                 for (int i = 0; i < sewersNodes.size(); i++) {
                                     locationScene.mLocationMarkers.add(
                                             new LocationMarker(
@@ -162,59 +145,14 @@ public class MainActivity extends AppCompatActivity {
                                                     sewersNodes.get(i).lat,
                                                     getSewersNode(new Color(android.graphics.Color.RED))));
                                 }
-
-                                //addPipe(sewersNodes.get(0).lat, sewersNodes.get(0).lon, sewersNodes.get(2).lat, sewersNodes.get(2).lon, new Color(android.graphics.Color.RED));
-                                /*locationScene.mLocationMarkers.add(
-                                        new LocationMarker(
-                                                points[0][0],
-                                                points[0][1],
-                                                getSewersNode(new Color(android.graphics.Color.RED))));
-
-                                locationScene.mLocationMarkers.add(
-                                        new LocationMarker(
-                                                points[1][0],
-                                                points[1][1],
-                                                getSewersNode(new Color(android.graphics.Color.RED))));
-
-                                locationScene.mLocationMarkers.add(
-                                        new LocationMarker(
-                                                points[2][0],
-                                                points[2][1],
-                                                getSewersNode(new Color(android.graphics.Color.RED))));
-
-
-
-
-                                locationScene.mLocationMarkers.add(
-                                        new LocationMarker(
-                                                points[3][0],
-                                                points[3][1],
-                                                getSewersNode(new Color(android.graphics.Color.BLUE))));
-
-                                locationScene.mLocationMarkers.add(
-                                        new LocationMarker(
-                                                points[4][0],
-                                                points[4][1],
-                                                getSewersNode(new Color(android.graphics.Color.BLUE))));
-
-                                //addPipe(points[3][1], points[3][0], points[4][1], points[4][0], new Color(android.graphics.Color.BLUE));
-
-
-                                locationScene.mLocationMarkers.add(
-                                        new LocationMarker(
-                                                points[5][0],
-                                                points[5][1],
-                                                getSewersNode(new Color(android.graphics.Color.YELLOW))));
-
-                                locationScene.mLocationMarkers.add(
-                                        new LocationMarker(
-                                                points[6][0],
-                                                points[6][1],
-                                                getSewersNode(new Color(android.graphics.Color.YELLOW))));
-
-                                //addPipe(points[5][1], points[5][0], points[6][1], points[6][0], new Color(android.graphics.Color.YELLOW));*/
-
-
+                                /*for(int i = 0; i < sewersPipes.size(); i++) {
+                                    double lat1, lat2, lon1, lon2;
+                                    lat1 = sewersNodes.get(sewersPipes.get(i).startNodeIndex).lat;
+                                    lon1 = sewersNodes.get(sewersPipes.get(i).startNodeIndex).lon;
+                                    lat2 = sewersNodes.get(sewersPipes.get(i).endNodeIndex).lat;
+                                    lon2 = sewersNodes.get(sewersPipes.get(i).endNodeIndex).lon;
+                                    addPipe(lat1, lon1, lat2, lon2, new Color(android.graphics.Color.RED));
+                                }*/
                             }
 
                             Frame frame = arSceneView.getArFrame();
@@ -228,39 +166,6 @@ public class MainActivity extends AppCompatActivity {
 
                             if (locationScene != null) {
                                 locationScene.processFrame(frame);
-
-                                /*final LocationMarker marker = locationScene.mLocationMarkers.get(0);
-                                final LocationMarker marker2 = locationScene.mLocationMarkers.get(2);
-
-                                marker.anchorNode.setParent(arSceneView.getScene());
-                                Vector3 point1, point2;
-                                point1 = marker.anchorNode.getWorldPosition();
-                                point2 = marker2.anchorNode.getWorldPosition();
-
-                                final Vector3 difference = Vector3.subtract(point1, point2);
-                                final Vector3 directionFromTopToBottom = difference.normalized();
-                                final Quaternion rotationFromAToB =
-                                        Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
-                                MaterialFactory.makeOpaqueWithColor(this, new Color(255, 0, 0))
-                                        .thenAccept(
-                                                material -> {
-                                                    ModelRenderable model = ShapeFactory.makeCylinder(0.1f, difference.length(),
-                                                            new Vector3(0f, 0f, 0f), material);
-                                                    model.setShadowReceiver(false);
-                                                    model.setShadowCaster(false);
-
-                                                    // 3. make node
-                                                    Node node = new Node();
-
-                                                    node.setParent(marker.anchorNode);
-                                                    node.setRenderable(model);
-
-                                                    node.setWorldPosition(Vector3.add(point1, point2).scaled(.5f));
-                                                    // 4. set rotation
-                                                    node.setWorldRotation(Quaternion.multiply(rotationFromAToB,
-                                                            Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), 90)));
-                                                }
-                                        );*/
                             }
 
                             /*if (loadingMessageSnackbar != null) {
@@ -279,11 +184,66 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void increaseAccuracy() {
+        for (int i = 0; i < sewersPipes.size(); i++) {
+            SewersNode sewersNode1 = sewersNodes.get(sewersPipes.get(i).startNodeIndex);
+            SewersNode sewersNode2 = sewersNodes.get(sewersPipes.get(i).endNodeIndex);
+            double distance = measureDistance(sewersNode1.lat, sewersNode2.lat, sewersNode1.lon, sewersNode2.lon);
+            if(distance > 2.0) {
+                int pipeIndex = 0;
+                for (int j = 0; j < sewersPipes.size(); j++) {
+                    if(sewersPipes.get(j).startNodeIndex == sewersPipes.get(j).startNodeIndex && sewersPipes.get(j).endNodeIndex == sewersPipes.get(j).endNodeIndex) {
+                        pipeIndex = j;
+                    }
+                }
+                sewersPipes.remove(pipeIndex);
+                addPipes(sewersNode1.index, sewersNode2.index);
+            }
+
+        }
+    }
+
+    private void addPipes(int sewersNode1Index, int sewersNode2Index) {
+        double distance = measureDistance(sewersNodes.get(sewersNode1Index).lat, sewersNodes.get(sewersNode2Index).lat, sewersNodes.get(sewersNode1Index).lon, sewersNodes.get(sewersNode2Index).lon);
+        double lon1,lon2,lat1,lat2;
+        if(distance > 2.0) {
+            SewersNode newSewersNode = new SewersNode();
+            int newSewersNodeIndex = sewersNodes.size();
+            newSewersNode.index = newSewersNodeIndex;
+
+            double dLon = Math.toRadians(sewersNodes.get(sewersNode2Index).lon - sewersNodes.get(sewersNode1Index).lon);
+            lat1 = Math.toRadians(sewersNodes.get(sewersNode1Index).lat);
+            lat2 = Math.toRadians(sewersNodes.get(sewersNode2Index).lat);
+            lon1 = Math.toRadians(sewersNodes.get(sewersNode1Index).lon);
+
+            double Bx = Math.cos(lat2) * Math.cos(dLon);
+            double By = Math.cos(lat2) * Math.sin(dLon);
+            double lat3 = Math.atan2(Math.sin(lat1) + Math.sin(lat2), Math.sqrt((Math.cos(lat1) + Bx) * (Math.cos(lat1) + Bx) + By * By));
+            double lon3 = lon1 + Math.atan2(By, Math.cos(lat1) + Bx);
+
+            newSewersNode.lon = Math.toDegrees(lon3);
+            newSewersNode.lat = Math.toDegrees(lat3);
+            newSewersNode.color = "";
+            sewersNodes.add(newSewersNode);
+
+            addPipes(sewersNode1Index, newSewersNodeIndex);
+            addPipes(newSewersNodeIndex, sewersNode2Index);
+        } else {
+            SewersPipe newSewersPipe = new SewersPipe();
+            newSewersPipe.index = sewersPipes.size();
+            newSewersPipe.startNodeIndex = sewersNode1Index;
+            newSewersPipe.endNodeIndex = sewersNode2Index;
+            newSewersPipe.color = "";
+            sewersPipes.add(newSewersPipe);
+            return;
+        }
+    }
+
     private void addPipe(double lat1, double lon1, double lat2, double lon2, Color pipeColor) {
         double newLon = (lon1 + lon2)/2;
         double newLat = (lat1 + lat2)/2;
-        float newDistance = measureDistance(lat1, lon1, lat2, lon2);
-        double bearing = LocationUtils.bearing(lat1, lon1, lat2, lon2);
+        float newDistance = measureDistance(lat1, lat2, lon1, lon2);
+        double bearing = countBearing(lat1, lat2, lon1, lon2);
         double currentOrientation = dOrientation.getOrientation();
         if(bearing < 90.0) {
             bearing += 90.0;
@@ -298,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
                         getPipe(newDistance, angle, pipeColor, locationScene)));
     }
 
-    private double countBearing(double lat1, double lon1, double lat2, double lon2) {
+    private double countBearing(double lat1, double lat2, double lon1, double lon2) {
         double dLon = Math.abs(lon1 - lon2);
         double y2 = Math.sin(dLon) * Math.cos(lat2);
         double x2 = Math.cos(lat1)*Math.sin(lat2) -
@@ -308,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private float measureDistance(double lat1, double lon1, double lat2, double lon2){  // generally used geo measurement function
+    private float measureDistance(double lat1, double lat2, double lon1, double lon2){  // generally used geo measurement function
         float R = 6378.137f; // Radius of earth in KM
         double dLat = lat2 * Math.PI / 180 - lat1 * Math.PI / 180;
         double dLon = lon2 * Math.PI / 180 - lon1 * Math.PI / 180;
@@ -338,14 +298,6 @@ public class MainActivity extends AppCompatActivity {
                             });
 
                         });
-
-        /*base.setRenderable(sewersNode );
-        Context c = this;
-        base.setOnTapListener((v, event) -> {
-            Toast.makeText(
-                    c, "Węzeł sieci", Toast.LENGTH_LONG)
-                    .show();
-        });*/
         return base;
     }
 
