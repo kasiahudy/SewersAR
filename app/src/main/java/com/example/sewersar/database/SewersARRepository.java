@@ -9,7 +9,9 @@ import androidx.lifecycle.LiveData;
 
 public class SewersARRepository {
     private SewersNodeDao mSewersNodeDao;
+    private SewersPipeDao mSewersPipeDao;
     private LiveData<List<SewersNode>> sewersNodes;
+    private LiveData<List<SewersPipe>> sewersPipes;
 
     // Note that in order to unit test the WordRepository, you have to remove the Application
     // dependency. This adds complexity and much more code, and this sample is not about testing.
@@ -19,12 +21,18 @@ public class SewersARRepository {
         SewersARDatabase db = SewersARDatabase.getDatabase(application);
         mSewersNodeDao = db.sewersNodeDao();
         sewersNodes = mSewersNodeDao.getAll();
+        mSewersPipeDao = db.sewersPipeDao();
+        sewersPipes = mSewersPipeDao.getAll();
     }
 
     // Room executes all queries on a separate thread.
     // Observed LiveData will notify the observer when the data has changed.
     public LiveData<List<SewersNode>> getAllNodes() {
         return sewersNodes;
+    }
+
+    public LiveData<List<SewersPipe>> getAllPipes() {
+        return sewersPipes;
     }
 
 }

@@ -65,6 +65,8 @@ public class LocationScene {
     private Session mSession;
     private DeviceLocationChanged locationChangedEvent;
 
+    private ModelRenderable pipeModel;
+
     public LocationScene(Activity context, ArSceneView mArSceneView) {
         this.context = context;
         this.mSession = mArSceneView.getSession();
@@ -75,6 +77,20 @@ public class LocationScene {
         deviceLocation = new DeviceLocation(context, this);
         deviceOrientation = new DeviceOrientation(context);
         deviceOrientation.resume();
+
+        MaterialFactory.makeOpaqueWithColor(context, new Color(255, 0, 0))
+                .thenAccept(
+                        material -> {
+                            pipeModel = ShapeFactory.makeCylinder(0.1f, 2.0f,
+                                    new Vector3(0f, 0f, 0f), material);
+                            //pipeModel.setShadowReceiver(false);
+                            //pipeModel.setShadowCaster(false);
+
+
+
+
+                        }
+                );
         //test();
     }
 
@@ -360,19 +376,83 @@ public class LocationScene {
             }
         }
 
+        /*Node marker = mLocationMarkers.get(0).anchorNode;
+        Node marker2 = mLocationMarkers.get(2).anchorNode;
+        marker.setParent(mArSceneView.getScene());
+        Vector3 point1, point2;
+        point1 = marker.getWorldPosition();
+        point2 = marker2.getWorldPosition();
 
-        createPipe(mLocationMarkers.get(0), mLocationMarkers.get(2));
-        createPipe(mLocationMarkers.get(2), mLocationMarkers.get(3));
+        final Vector3 difference = Vector3.subtract(point1, point2);
+        final Vector3 directionFromTopToBottom = difference.normalized();
+        final Quaternion rotationFromAToB =
+                Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
+
+        Node node = new Node();
+        node.setParent(marker);
+        Vector3 xxx = Vector3.add(point1, point2).scaled(.5f);
+        node.setWorldPosition(xxx);
+        //node.setWorldRotation(Quaternion.multiply(rotationFromAToB,
+                //Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), 90)));
+
+        createPipe3(marker, node, marker);
+
+        createPipe3(marker2, node, marker);*/
+        createPipe(mLocationMarkers.get(0).anchorNode, mLocationMarkers.get(2).anchorNode);
 
         System.gc();
     }
 
-    private void createPipe(final LocationMarker marker, final LocationMarker marker2) {
-
-        marker.anchorNode.setParent(mArSceneView.getScene());
+    private void createPipe3(final Node marker, final Node marker2, final Node parent) {
+        marker.setParent(mArSceneView.getScene());
         Vector3 point1, point2;
-        point1 = marker.anchorNode.getWorldPosition();
-        point2 = marker2.anchorNode.getWorldPosition();
+        point1 = marker.getWorldPosition();
+        point2 = marker2.getWorldPosition();
+
+        final Vector3 difference = Vector3.subtract(point1, point2);
+        final Vector3 directionFromTopToBottom = difference.normalized();
+        final Quaternion rotationFromAToB =
+                Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
+
+        Node node = new Node();
+        node.setParent(marker);
+        Vector3 xxx = Vector3.add(point1, point2).scaled(.5f);
+        node.setWorldPosition(xxx);
+        //node.setWorldRotation(Quaternion.multiply(rotationFromAToB,
+        //Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), 90)));
+
+        createPipe2(marker, node, marker);
+
+        createPipe2(marker2, node, marker);
+
+    }
+
+    private void createPipe2(final Node marker, final Node marker2, final Node parent) {
+        marker.setParent(mArSceneView.getScene());
+        Vector3 point1, point2;
+        point1 = marker.getWorldPosition();
+        point2 = marker2.getWorldPosition();
+
+        final Vector3 difference = Vector3.subtract(point1, point2);
+        final Vector3 directionFromTopToBottom = difference.normalized();
+        final Quaternion rotationFromAToB =
+                Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
+
+        Node node = new Node();
+        node.setParent(parent);
+        Vector3 xxx = Vector3.add(point1, point2).scaled(.5f);
+        node.setWorldPosition(xxx);
+        node.setWorldRotation(Quaternion.multiply(rotationFromAToB,
+                Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), 90)));
+        node.setRenderable(pipeModel);
+
+    }
+
+    private void createPipe(final Node marker, final Node marker2) {
+        marker.setParent(mArSceneView.getScene());
+        Vector3 point1, point2;
+        point1 = marker.getWorldPosition();
+        point2 = marker2.getWorldPosition();
 
         final Vector3 difference = Vector3.subtract(point1, point2);
         final Vector3 directionFromTopToBottom = difference.normalized();
@@ -389,19 +469,13 @@ public class LocationScene {
                             // 3. make node
                             Node node = new Node();
 
-                            node.setParent(marker.anchorNode);
+                            node.setParent(marker);
                             node.setRenderable(model);
-                            Vector3 xxx = Vector3.add(point1, point2).scaled(.5f);
-                            node.setWorldPosition(xxx);
+
+                            node.setWorldPosition(Vector3.add(point1, point2).scaled(.5f));
                             // 4. set rotation
                             node.setWorldRotation(Quaternion.multiply(rotationFromAToB,
                                     Quaternion.axisAngle(new Vector3(1.0f, 0.0f, 0.0f), 90)));
-                            Context c = this.context;
-                            node.setOnTapListener((v, event) -> {
-                                Toast.makeText(
-                                        c, "dlugosc: " + difference.length(), Toast.LENGTH_LONG)
-                                        .show();
-                            });
                         }
                 );
     }

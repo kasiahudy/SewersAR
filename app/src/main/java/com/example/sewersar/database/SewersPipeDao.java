@@ -7,9 +7,7 @@ import androidx.room.Dao;
 import androidx.room.Query;
 
 @Dao
-public interface SewersNodeDao {
-    @Query("SELECT * FROM SewersNode")
-    LiveData<List<SewersNode>> getAll();
-
+public interface SewersPipeDao {
+    @Query("SELECT * FROM SewersPipe")
+    LiveData<List<SewersPipe>> getAll();
 }
-

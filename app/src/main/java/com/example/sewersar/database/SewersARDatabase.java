@@ -9,9 +9,10 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {SewersNode.class}, version = 1)
+@Database(entities = {SewersNode.class, SewersPipe.class}, version = 2)
 public abstract class SewersARDatabase extends RoomDatabase {
     public abstract SewersNodeDao sewersNodeDao();
+    public abstract SewersPipeDao sewersPipeDao();
 
     private static volatile SewersARDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;
@@ -24,6 +25,7 @@ public abstract class SewersARDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(), SewersARDatabase.class, "mySewersDB2.db")
                             .createFromAsset("database/sewersDB.db")
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

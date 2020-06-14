@@ -2,6 +2,7 @@ package com.example.sewersar;
 
 import com.example.sewersar.database.SewersARViewModel;
 import com.example.sewersar.database.SewersNode;
+import com.example.sewersar.database.SewersPipe;
 import com.example.sewersar.sensor.DeviceOrientation;
 import com.example.sewersar.utils.ARLocationPermissionHelper;
 
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
     private SewersARViewModel mSewersARViewModel;
     List<SewersNode> sewersNodes;
+    List<SewersPipe> sewersPipes;
 
     //18.5730080, 54.3517372
     //18.5729852, 54.3517485
@@ -93,6 +95,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable final List<SewersNode> newSewersNodes) {
                 sewersNodes = newSewersNodes;
+            }
+        });
+
+        mSewersARViewModel.getAllPipes().observe(this, new Observer<List<SewersPipe>>() {
+            @Override
+            public void onChanged(@Nullable final List<SewersPipe> newSewersPipes) {
+                sewersPipes = newSewersPipes;
             }
         });
 
@@ -145,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
                                 locationScene = new LocationScene(this, arSceneView);
 
                                 // Adding a simple location marker of a 3D model
-
+                                SewersPipe sp = sewersPipes.get(0);
                                 for (int i = 0; i < sewersNodes.size(); i++) {
                                     locationScene.mLocationMarkers.add(
                                             new LocationMarker(
@@ -153,6 +162,8 @@ public class MainActivity extends AppCompatActivity {
                                                     sewersNodes.get(i).lat,
                                                     getSewersNode(new Color(android.graphics.Color.RED))));
                                 }
+
+                                //addPipe(sewersNodes.get(0).lat, sewersNodes.get(0).lon, sewersNodes.get(2).lat, sewersNodes.get(2).lon, new Color(android.graphics.Color.RED));
                                 /*locationScene.mLocationMarkers.add(
                                         new LocationMarker(
                                                 points[0][0],
@@ -171,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
                                                 points[2][1],
                                                 getSewersNode(new Color(android.graphics.Color.RED))));
 
-                                //addPipe(points[0][1], points[0][0], points[2][1], points[2][0], new Color(android.graphics.Color.RED));
+
 
 
                                 locationScene.mLocationMarkers.add(
