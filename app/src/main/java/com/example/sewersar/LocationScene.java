@@ -384,10 +384,16 @@ public class LocationScene {
         final Vector3 directionFromTopToBottom = difference.normalized();
         final Quaternion rotationFromAToB =
                 Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
+        Vector3 vector = Vector3.subtract(point2, point1);
+        Quaternion lookRotation = Quaternion.lookRotation(vector, Vector3.up());
+        float lenght1 = difference.length();
+        float cos = (float)Math.cos(lookRotation.x);
+        float cos2 = (float)Math.cos(lookRotation.z);
+        float length = lenght1 - (lenght1*Math.abs(lookRotation.z));
         MaterialFactory.makeOpaqueWithColor(context, new Color(255, 0, 0))
                 .thenAccept(
                         material -> {
-                            ModelRenderable model = ShapeFactory.makeCylinder(0.1f, difference.length(),
+                            ModelRenderable model = ShapeFactory.makeCylinder(0.1f, length,
                                     new Vector3(0f, 0f, 0f), material);
                             model.setShadowReceiver(false);
                             model.setShadowCaster(false);
@@ -400,12 +406,19 @@ public class LocationScene {
 
                             node.setWorldPosition(Vector3.add(point1, point2).scaled(.5f));
                             // 4. set rotation
-                            Vector3 vector = Vector3.subtract(point2, point1);
-                            Quaternion lookRotation = Quaternion.lookRotation(vector, Vector3.up());
+                            float z = lookRotation.z;
+                            float x = lookRotation.x;
+                            node.setOnTapListener((v, event) -> {
+                                Toast.makeText(
+                                        context, "x: " + x + "z: " + z, Toast.LENGTH_LONG)
+                                        .show();
+                            });
                             lookRotation.z = 0;
                             lookRotation.x = 0;
                             Quaternion worldRotation = Quaternion.multiply(lookRotation, Quaternion.axisAngle(Vector3.left(), 90));
                             node.setWorldRotation(worldRotation);
+
+
                         }
                 );
     }

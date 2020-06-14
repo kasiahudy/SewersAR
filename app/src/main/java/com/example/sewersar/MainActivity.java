@@ -286,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
                 .thenAccept(
                         material -> {
                             sewersNode =
-                                    ShapeFactory.makeSphere(0.1f, new Vector3(0.0f, 0.00f, 0.0f), material);
+                                    ShapeFactory.makeSphere(0.2f, new Vector3(0.0f, 0.00f, 0.0f), material);
 
 
                             base.setRenderable(sewersNode );
