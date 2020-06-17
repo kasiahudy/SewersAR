@@ -9,6 +9,7 @@ import com.example.sewersar.utils.ARLocationPermissionHelper;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Context;
 
@@ -60,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
     List<SewersNode> sewersNodes;
     List<SewersPipe> sewersPipes;
 
+    private static TextView myCoordsTextView;
+
     @Override
     @SuppressWarnings({
             "AndroidApiChecker",
@@ -71,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_sceneform);
         arSceneView = findViewById(R.id.ar_scene_view);
+        myCoordsTextView = findViewById(R.id.textView);
+
 
         mSewersARViewModel = new ViewModelProvider(this).get(SewersARViewModel.class);
         mSewersARViewModel.getAllNodes().observe(this, new Observer<List<SewersNode>>() {
@@ -143,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                                             new LocationMarker(
                                                     sewersNodes.get(i).lon,
                                                     sewersNodes.get(i).lat,
-                                                    getSewersNode(new Color(android.graphics.Color.RED))));
+                                                    getSewersNode(new Color(android.graphics.Color.RED), sewersNodes.get(i).lon, sewersNodes.get(i).lat)));
                                 }
                                 /*for(int i = 0; i < sewersPipes.size(); i++) {
                                     double lat1, lat2, lon1, lon2;
@@ -182,6 +187,12 @@ public class MainActivity extends AppCompatActivity {
         ARLocationPermissionHelper.requestPermission(this);
 
 
+    }
+
+    public static void setMyCoordsTextView(String text) {
+        if(MainActivity.myCoordsTextView != null) {
+            MainActivity.myCoordsTextView.setText(text);
+        }
     }
 
     private void increaseAccuracy() {
@@ -280,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
         return (float)d * 1000; // meters
     }
 
-    private Node getSewersNode(Color nodeColor) {
+    private Node getSewersNode(Color nodeColor, double lon, double lat) {
         Node base = new Node();
         MaterialFactory.makeOpaqueWithColor(this, nodeColor)
                 .thenAccept(
@@ -293,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
                             Context c = this;
                             base.setOnTapListener((v, event) -> {
                                 Toast.makeText(
-                                        c, "Węzeł sieci", Toast.LENGTH_LONG)
+                                        c, "Węzeł sieci \n Lat: " + lat + " Lon: " + lon, Toast.LENGTH_LONG)
                                         .show();
                             });
 

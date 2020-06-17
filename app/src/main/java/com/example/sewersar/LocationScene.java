@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.sewersar.database.SewersPipe;
@@ -375,6 +376,7 @@ public class LocationScene {
     }
 
     private void createPipe(final AnchorNode marker, final AnchorNode  marker2) {
+
         marker.setParent(mArSceneView.getScene());
         Vector3 point1, point2;
         point1 = marker.getWorldPosition();
@@ -385,11 +387,12 @@ public class LocationScene {
         final Quaternion rotationFromAToB =
                 Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
         Vector3 vector = Vector3.subtract(point2, point1);
-        Quaternion lookRotation = Quaternion.lookRotation(vector, Vector3.up());
-        float lenght1 = difference.length();
+
+        Quaternion lookRotation = Quaternion.lookRotation(difference, Vector3.up());
+        float lenght1 = vector.length();
         float cos = (float)Math.cos(lookRotation.x);
         float cos2 = (float)Math.cos(lookRotation.z);
-        float length = lenght1 - (lenght1*Math.abs(lookRotation.z));
+        float length = lenght1 - (lenght1*Math.abs((Math.abs(lookRotation.z) - Math.abs(lookRotation.x))));
         MaterialFactory.makeOpaqueWithColor(context, new Color(255, 0, 0))
                 .thenAccept(
                         material -> {

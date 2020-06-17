@@ -14,6 +14,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import com.example.sewersar.LocationScene;
+import com.example.sewersar.MainActivity;
 import com.example.sewersar.utils.KalmanLatLong;
 
 /**
@@ -70,6 +71,8 @@ public class DeviceLocation implements LocationListener {
         gpsCount++;
 
         filterAndAddLocation(newLocation);
+
+        MainActivity.setMyCoordsTextView("Lat: " + newLocation.getLatitude() + " Lon: " + newLocation.getLongitude());
     }
 
     @Override
