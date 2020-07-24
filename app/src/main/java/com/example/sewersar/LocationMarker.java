@@ -13,6 +13,8 @@ import com.example.sewersar.rendering.LocationNodeRender;
 
 public class LocationMarker {
 
+    public int index;
+
     // Location in real-world terms
     public double longitude;
     public double latitude;
@@ -32,10 +34,11 @@ public class LocationMarker {
     private float gradualScalingMinScale = 0.8F;
     private float gradualScalingMaxScale = 1.4F;
 
-    public LocationMarker(double longitude, double latitude, Node node) {
+    public LocationMarker(double longitude, double latitude, Node node, int index) {
         this.longitude = longitude;
         this.latitude = latitude;
         this.node = node;
+        this.index = index;
     }
 
     public float getGradualScalingMinScale() {

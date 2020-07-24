@@ -369,9 +369,17 @@ public class LocationScene {
         }
 
         for(int i = 0; i < sewersPipes.size(); i++) {
-            createPipe(mLocationMarkers.get(sewersPipes.get(i).startNodeIndex).anchorNode,
-                    mLocationMarkers.get(sewersPipes.get(i).endNodeIndex).anchorNode,
-                    new Color(android.graphics.Color.parseColor(sewersPipes.get(i).color)));
+            final int iFin = i;
+            LocationMarker start = mLocationMarkers.stream()
+                    .filter(locationMarker -> sewersPipes.get(iFin).startNodeIndex == locationMarker.index)
+                    .findAny()
+                    .orElse(null);
+            LocationMarker end = mLocationMarkers.stream()
+                    .filter(locationMarker -> sewersPipes.get(iFin).endNodeIndex == locationMarker.index)
+                    .findAny()
+                    .orElse(null);
+
+            createPipe(start.anchorNode, end.anchorNode, new Color(android.graphics.Color.parseColor(sewersPipes.get(i).color)));
         }
 
         System.gc();

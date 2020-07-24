@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Context;
@@ -21,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.sewersar.utils.LocationUtils;
 import com.google.ar.core.Frame;
 import com.google.ar.core.Session;
 import com.google.ar.core.TrackingState;
@@ -38,10 +36,8 @@ import com.google.ar.sceneform.ArSceneView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -62,10 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private DeviceOrientation dOrientation;
 
     private SewersARViewModel mSewersARViewModel;
-    List<SewersNode> sewersNodes;
-    List<SewersNode> selectedSewersNodes;
-    List<SewersPipe> sewersPipes;
-    List<SewersPipe> selectedSewersPipes;
+
 
     private static TextView myCoordsTextView;
 
@@ -82,21 +75,23 @@ public class MainActivity extends AppCompatActivity {
         arSceneView = findViewById(R.id.ar_scene_view);
         myCoordsTextView = findViewById(R.id.textView);
 
-        selectedSewersNodes = new ArrayList<>();
-        selectedSewersPipes = new ArrayList<>();
+        SewersNodesController.setSelectedSewersNodes(new ArrayList<>());
+        SewersNodesController.setSelectedSewersPipes(new ArrayList<>());
+        SewersNodesController.setSelectedSewersTypesStrings(new ArrayList<>());
+        SewersNodesController.setAllSewersTypesStrings(new ArrayList<>());
 
         mSewersARViewModel = new ViewModelProvider(this).get(SewersARViewModel.class);
         mSewersARViewModel.getAllNodes().observe(this, new Observer<List<SewersNode>>() {
             @Override
             public void onChanged(@Nullable final List<SewersNode> newSewersNodes) {
-                sewersNodes = newSewersNodes;
+                SewersNodesController.setSewersNodes(newSewersNodes);
             }
         });
 
         mSewersARViewModel.getAllPipes().observe(this, new Observer<List<SewersPipe>>() {
             @Override
             public void onChanged(@Nullable final List<SewersPipe> newSewersPipes) {
-                sewersPipes = newSewersPipes;
+                SewersNodesController.setSewersPipes(newSewersPipes);
             }
         });
 
@@ -142,32 +137,43 @@ public class MainActivity extends AppCompatActivity {
                             if (!hasFinishedLoading) {
                                 return;
                             }
-
+                            if(SewersNodesController.isSelectedSewersChanged()) {
+                                SewersNodesController.setSelectedSewersChanged(false);
+                                locationScene.clearMarkers();
+                                locationScene = null;
+                            }
                             if (locationScene == null) {
                                 // If our locationScene object hasn't been setup yet, this is a good time to do it
                                 // We know that here, the AR components have been initiated.
-                                for(int i = 0; i < sewersPipes.size(); i++) {
-                                    if(sewersNodes.get(sewersPipes.get(i).endNodeIndex).type.equals("Sieć wodociągowa") && sewersNodes.get(sewersPipes.get(i).startNodeIndex).type.equals("Sieć wodociągowa")) {
-                                        selectedSewersPipes.add(sewersPipes.get(i));
+                                SewersNodesController.getSelectedSewersPipes().clear();
+                                SewersNodesController.getSelectedSewersNodes().clear();
+
+                                List<String> s = SewersNodesController.getSelectedSewersTypesStrings();
+                                for(int i = 0; i < SewersNodesController.getSewersPipes().size(); i++) {
+                                    if(SewersNodesController.getSelectedSewersTypesStrings().contains(SewersNodesController.getSewersNodes().get(SewersNodesController.getSewersPipes().get(i).endNodeIndex).type)
+                                            && SewersNodesController.getSelectedSewersTypesStrings().contains(SewersNodesController.getSewersNodes().get(SewersNodesController.getSewersPipes().get(i).startNodeIndex).type)) {
+                                        SewersNodesController.getSelectedSewersPipes().add(SewersNodesController.getSewersPipes().get(i));
                                     }
                                 }
-                                locationScene = new LocationScene(this, arSceneView, selectedSewersPipes);
+                                for (int i = 0; i < SewersNodesController.getSewersNodes().size(); i++) {
+                                    if(SewersNodesController.getSelectedSewersTypesStrings().contains(SewersNodesController.getSewersNodes().get(i).type)) {
+                                        SewersNodesController.getSelectedSewersNodes().add(SewersNodesController.getSewersNodes().get(i));
+                                    }
+                                }
+                                locationScene = new LocationScene(this, arSceneView, SewersNodesController.getSelectedSewersPipes());
 
                                 // Adding a simple location marker of a 3D model
-                                SewersPipe sp = sewersPipes.get(0);
+                                SewersPipe sp = SewersNodesController.getSewersPipes().get(0);
                                 //increaseAccuracy();
-
-                                for (int i = 0; i < sewersNodes.size(); i++) {
-                                    if(sewersNodes.get(i).type.equals("Sieć wodociągowa")) {
-                                        selectedSewersNodes.add(sewersNodes.get(i));
-                                    }
-                                }
-                                for (int i = 0; i < selectedSewersNodes.size(); i++) {
+                                for (int i = 0; i < SewersNodesController.getSelectedSewersNodes().size(); i++) {
                                     locationScene.mLocationMarkers.add(
                                             new LocationMarker(
-                                                    selectedSewersNodes.get(i).lon,
-                                                    selectedSewersNodes.get(i).lat,
-                                                    getSewersNode(new Color(android.graphics.Color.parseColor(selectedSewersNodes.get(i).color)), selectedSewersNodes.get(i).lon, selectedSewersNodes.get(i).lat)));
+                                                    SewersNodesController.getSelectedSewersNodes().get(i).lon,
+                                                    SewersNodesController.getSelectedSewersNodes().get(i).lat,
+                                                    getSewersNode(new Color(android.graphics.Color.parseColor(SewersNodesController.getSelectedSewersNodes().get(i).color)),
+                                                            SewersNodesController.getSelectedSewersNodes().get(i).lon,
+                                                            SewersNodesController.getSelectedSewersNodes().get(i).lat),
+                                                    SewersNodesController.getSelectedSewersNodes().get(i).index));
 
                                 }
                                 /*for(int i = 0; i < sewersPipes.size(); i++) {
@@ -211,7 +217,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void selectSewersType(View view) {
         Intent intent = new Intent(this, SelectSewersTypeActivity.class);
-
         startActivity(intent);
     }
 
@@ -221,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void increaseAccuracy() {
+    /*private void increaseAccuracy() {
         for (int i = 0; i < sewersPipes.size(); i++) {
             SewersNode sewersNode1 = sewersNodes.get(sewersPipes.get(i).startNodeIndex);
             SewersNode sewersNode2 = sewersNodes.get(sewersPipes.get(i).endNodeIndex);
@@ -274,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
             sewersPipes.add(newSewersPipe);
             return;
         }
-    }
+    }*/
 
     private void addPipe(double lat1, double lon1, double lat2, double lon2, Color pipeColor) {
         double newLon = (lon1 + lon2)/2;
@@ -292,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
                 new LocationMarker(
                         newLon,
                         newLat,
-                        getPipe(newDistance, angle, pipeColor, locationScene)));
+                        getPipe(newDistance, angle, pipeColor, locationScene),0));
     }
 
     private double countBearing(double lat1, double lat2, double lon1, double lon2) {
