@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                                             new LocationMarker(
                                                     sewersNodes.get(i).lon,
                                                     sewersNodes.get(i).lat,
-                                                    getSewersNode(new Color(android.graphics.Color.RED), sewersNodes.get(i).lon, sewersNodes.get(i).lat)));
+                                                    getSewersNode(new Color(android.graphics.Color.parseColor(sewersNodes.get(i).color)), sewersNodes.get(i).lon, sewersNodes.get(i).lat)));
                                 }
                                 /*for(int i = 0; i < sewersPipes.size(); i++) {
                                     double lat1, lat2, lon1, lon2;

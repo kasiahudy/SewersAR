@@ -369,13 +369,15 @@ public class LocationScene {
         }
 
         for(int i = 0; i < sewersPipes.size(); i++) {
-            createPipe(mLocationMarkers.get(sewersPipes.get(i).startNodeIndex).anchorNode, mLocationMarkers.get(sewersPipes.get(i).endNodeIndex).anchorNode);
+            createPipe(mLocationMarkers.get(sewersPipes.get(i).startNodeIndex).anchorNode,
+                    mLocationMarkers.get(sewersPipes.get(i).endNodeIndex).anchorNode,
+                    new Color(android.graphics.Color.parseColor(sewersPipes.get(i).color)));
         }
 
         System.gc();
     }
 
-    private void createPipe(final AnchorNode marker, final AnchorNode  marker2) {
+    private void createPipe(final AnchorNode marker, final AnchorNode  marker2, Color color) {
 
         marker.setParent(mArSceneView.getScene());
         Vector3 point1, point2;
@@ -393,7 +395,7 @@ public class LocationScene {
         float cos = (float)Math.cos(lookRotation.x);
         float cos2 = (float)Math.cos(lookRotation.z);
         float length = lenght1 - (lenght1*Math.abs((Math.abs(lookRotation.z) - Math.abs(lookRotation.x))));
-        MaterialFactory.makeOpaqueWithColor(context, new Color(255, 0, 0))
+        MaterialFactory.makeOpaqueWithColor(context, color)
                 .thenAccept(
                         material -> {
                             ModelRenderable model = ShapeFactory.makeCylinder(0.1f, length,
