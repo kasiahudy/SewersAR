@@ -6,9 +6,11 @@ import com.example.sewersar.database.SewersPipe;
 import com.example.sewersar.sensor.DeviceOrientation;
 import com.example.sewersar.utils.ARLocationPermissionHelper;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Context;
@@ -39,6 +41,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -187,6 +190,12 @@ public class MainActivity extends AppCompatActivity {
         ARLocationPermissionHelper.requestPermission(this);
 
 
+    }
+
+    public void selectSewersType(View view) {
+        Intent intent = new Intent(this, SelectSewersTypeActivity.class);
+
+        startActivity(intent);
     }
 
     public static void setMyCoordsTextView(String text) {

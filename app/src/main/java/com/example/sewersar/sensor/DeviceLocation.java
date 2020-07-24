@@ -72,7 +72,7 @@ public class DeviceLocation implements LocationListener {
 
         filterAndAddLocation(newLocation);
 
-        MainActivity.setMyCoordsTextView("Lat: " + newLocation.getLatitude() + " Lon: " + newLocation.getLongitude());
+        MainActivity.setMyCoordsTextView("Aktualne położenie\nLat: " + newLocation.getLatitude() + " Lon: " + newLocation.getLongitude());
     }
 
     @Override

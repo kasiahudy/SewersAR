@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SewersAR</string>
+    <string name="selectSewersType">Select sewers type shown</string>
+    <string name="selectSewersTypeTextView">Select sewers type</string>
 </resources>
