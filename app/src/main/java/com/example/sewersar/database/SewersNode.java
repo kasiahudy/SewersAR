@@ -24,5 +24,9 @@ public class SewersNode {
     @NonNull
     @ColumnInfo(name = "color")
     public String color;
+
+    @NonNull
+    @ColumnInfo(name = "type")
+    public String type;
 }
 

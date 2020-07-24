@@ -36,6 +36,7 @@ import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.ArSceneView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -62,7 +63,9 @@ public class MainActivity extends AppCompatActivity {
 
     private SewersARViewModel mSewersARViewModel;
     List<SewersNode> sewersNodes;
+    List<SewersNode> selectedSewersNodes;
     List<SewersPipe> sewersPipes;
+    List<SewersPipe> selectedSewersPipes;
 
     private static TextView myCoordsTextView;
 
@@ -79,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
         arSceneView = findViewById(R.id.ar_scene_view);
         myCoordsTextView = findViewById(R.id.textView);
 
+        selectedSewersNodes = new ArrayList<>();
+        selectedSewersPipes = new ArrayList<>();
 
         mSewersARViewModel = new ViewModelProvider(this).get(SewersARViewModel.class);
         mSewersARViewModel.getAllNodes().observe(this, new Observer<List<SewersNode>>() {
@@ -141,17 +146,29 @@ public class MainActivity extends AppCompatActivity {
                             if (locationScene == null) {
                                 // If our locationScene object hasn't been setup yet, this is a good time to do it
                                 // We know that here, the AR components have been initiated.
-                                locationScene = new LocationScene(this, arSceneView, sewersPipes);
+                                for(int i = 0; i < sewersPipes.size(); i++) {
+                                    if(sewersNodes.get(sewersPipes.get(i).endNodeIndex).type.equals("Sieć wodociągowa") && sewersNodes.get(sewersPipes.get(i).startNodeIndex).type.equals("Sieć wodociągowa")) {
+                                        selectedSewersPipes.add(sewersPipes.get(i));
+                                    }
+                                }
+                                locationScene = new LocationScene(this, arSceneView, selectedSewersPipes);
 
                                 // Adding a simple location marker of a 3D model
                                 SewersPipe sp = sewersPipes.get(0);
                                 //increaseAccuracy();
+
                                 for (int i = 0; i < sewersNodes.size(); i++) {
+                                    if(sewersNodes.get(i).type.equals("Sieć wodociągowa")) {
+                                        selectedSewersNodes.add(sewersNodes.get(i));
+                                    }
+                                }
+                                for (int i = 0; i < selectedSewersNodes.size(); i++) {
                                     locationScene.mLocationMarkers.add(
                                             new LocationMarker(
-                                                    sewersNodes.get(i).lon,
-                                                    sewersNodes.get(i).lat,
-                                                    getSewersNode(new Color(android.graphics.Color.parseColor(sewersNodes.get(i).color)), sewersNodes.get(i).lon, sewersNodes.get(i).lat)));
+                                                    selectedSewersNodes.get(i).lon,
+                                                    selectedSewersNodes.get(i).lat,
+                                                    getSewersNode(new Color(android.graphics.Color.parseColor(selectedSewersNodes.get(i).color)), selectedSewersNodes.get(i).lon, selectedSewersNodes.get(i).lat)));
+
                                 }
                                 /*for(int i = 0; i < sewersPipes.size(); i++) {
                                     double lat1, lat2, lon1, lon2;
