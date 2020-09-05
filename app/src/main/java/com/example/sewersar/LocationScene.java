@@ -328,7 +328,7 @@ public class LocationScene {
                 }
 
                 // Don't immediately assign newly created anchor in-case of exceptions
-                Pose translation = Pose.makeTranslation(xRotated, y, zRotated);
+                Pose translation = Pose.makeTranslation(xRotated, y - 1.0f, zRotated);
                 Anchor newAnchor = mSession.createAnchor(
                         frame.getCamera()
                                 .getDisplayOrientedPose()
@@ -407,7 +407,7 @@ public class LocationScene {
                 .thenAccept(
                         material -> {
                             ModelRenderable model = ShapeFactory.makeCylinder(0.1f, length,
-                                    new Vector3(0f, 0f, 0f), material);
+                                    new Vector3(0f, 0f, MainActivity.height), material);
                             model.setShadowReceiver(false);
                             model.setShadowCaster(false);
 

@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.WindowManager;
 
+import com.example.sewersar.MainActivity;
+
 /**
  * Created by John on 02/03/2018.
  */
@@ -84,6 +86,7 @@ public class DeviceOrientation implements SensorEventListener {
         SensorManager.getOrientation(adjustedRotationMatrix, orientation);
 
         this.orientation = ((float) Math.toDegrees(orientation[0]) + 360f) % 360f;
+        MainActivity.setMyRotationTextView("Aktualna orientacja " + this.orientation);
     }
 
     @Override

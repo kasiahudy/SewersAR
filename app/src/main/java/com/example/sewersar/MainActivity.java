@@ -61,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private static TextView myCoordsTextView;
+    private static TextView myRotationTextView;
+
+    public static float height = -4f;
 
     @Override
     @SuppressWarnings({
@@ -74,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sceneform);
         arSceneView = findViewById(R.id.ar_scene_view);
         myCoordsTextView = findViewById(R.id.textView);
+        myRotationTextView = findViewById(R.id.textView2);
 
         SewersNodesController.setSelectedSewersNodes(new ArrayList<>());
         SewersNodesController.setSelectedSewersPipes(new ArrayList<>());
@@ -226,6 +230,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static void setMyRotationTextView(String text) {
+        if(MainActivity.myRotationTextView != null) {
+            MainActivity.myRotationTextView.setText(text);
+        }
+    }
+
     /*private void increaseAccuracy() {
         for (int i = 0; i < sewersPipes.size(); i++) {
             SewersNode sewersNode1 = sewersNodes.get(sewersPipes.get(i).startNodeIndex);
@@ -328,7 +338,7 @@ public class MainActivity extends AppCompatActivity {
                 .thenAccept(
                         material -> {
                             sewersNode =
-                                    ShapeFactory.makeSphere(0.2f, new Vector3(0.0f, 0.00f, 0.0f), material);
+                                    ShapeFactory.makeSphere(0.2f, new Vector3(0.0f, height, 0.0f), material);
 
 
                             base.setRenderable(sewersNode );
