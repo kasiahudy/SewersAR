@@ -28,7 +28,7 @@ public class LocationMarker {
     // Called on each frame if not null
     private LocationNodeRender renderEvent;
     private float scaleModifier = 1F;
-    private float height = 0F;
+    private float height = -4F;
     private int onlyRenderWhenWithin = Integer.MAX_VALUE;
     private ScalingMode scalingMode = ScalingMode.FIXED_SIZE_ON_SCREEN;
     private float gradualScalingMinScale = 0.8F;

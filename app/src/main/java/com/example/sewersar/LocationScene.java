@@ -2,6 +2,7 @@ package com.example.sewersar;
 
 import android.app.Activity;
 import android.content.Context;
+import android.location.Location;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.TextView;
@@ -37,7 +38,7 @@ import com.example.sewersar.utils.LocationUtils;
 
 public class LocationScene {
 
-    private float RENDER_DISTANCE = 25f;
+    private float RENDER_DISTANCE = 100f;
     public ArSceneView mArSceneView;
     public DeviceLocation deviceLocation;
     public DeviceOrientation deviceOrientation;
@@ -379,13 +380,15 @@ public class LocationScene {
                     .findAny()
                     .orElse(null);
 
-            createPipe(start.anchorNode, end.anchorNode, new Color(android.graphics.Color.parseColor(sewersPipes.get(i).color)));
+            double dist = LocationUtils.distance(start.latitude, end.latitude, start.longitude, end.longitude,0,0);
+
+            createPipe(start.anchorNode, end.anchorNode, new Color(android.graphics.Color.parseColor(sewersPipes.get(i).color)), dist);
         }
 
         System.gc();
     }
 
-    private void createPipe(final AnchorNode marker, final AnchorNode  marker2, Color color) {
+    private void createPipe(final AnchorNode marker, final AnchorNode  marker2, Color color, double dist) {
 
         marker.setParent(mArSceneView.getScene());
         Vector3 point1, point2;
@@ -423,7 +426,7 @@ public class LocationScene {
                             float x = lookRotation.x;
                             node.setOnTapListener((v, event) -> {
                                 Toast.makeText(
-                                        context, "x: " + x + "z: " + z, Toast.LENGTH_LONG)
+                                        context, "Długość połączenia: \n" + String.format("%.0f%n", dist) + " m", Toast.LENGTH_LONG)
                                         .show();
                             });
                             lookRotation.z = 0;

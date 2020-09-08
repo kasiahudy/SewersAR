@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private static TextView myCoordsTextView;
     private static TextView myRotationTextView;
 
-    public static float height = -4f;
+    public static float height = 0f;
 
     @Override
     @SuppressWarnings({
@@ -320,8 +320,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private float measureDistance(double lat1, double lat2, double lon1, double lon2){  // generally used geo measurement function
-        float R = 6378.137f; // Radius of earth in KM
+    private float measureDistance(double lat1, double lat2, double lon1, double lon2){
+        float R = 6378.137f;
         double dLat = lat2 * Math.PI / 180 - lat1 * Math.PI / 180;
         double dLon = lon2 * Math.PI / 180 - lon1 * Math.PI / 180;
         double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -329,7 +329,7 @@ public class MainActivity extends AppCompatActivity {
                         Math.sin(dLon/2) * Math.sin(dLon/2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         double d = R * c;
-        return (float)d * 1000; // meters
+        return (float)d * 1000;
     }
 
     private Node getSewersNode(Color nodeColor, double lon, double lat) {
@@ -345,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
                             Context c = this;
                             base.setOnTapListener((v, event) -> {
                                 Toast.makeText(
-                                        c, "Węzeł sieci \n Lat: " + lat + " Lon: " + lon, Toast.LENGTH_LONG)
+                                        c, "Węzeł sieci \n Lat: " + String.format("%.6f%n", lat) + " Lon: " + String.format("%.6f%n", lon), Toast.LENGTH_LONG)
                                         .show();
                             });
 

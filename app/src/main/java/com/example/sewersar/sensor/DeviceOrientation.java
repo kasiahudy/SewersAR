@@ -86,7 +86,7 @@ public class DeviceOrientation implements SensorEventListener {
         SensorManager.getOrientation(adjustedRotationMatrix, orientation);
 
         this.orientation = ((float) Math.toDegrees(orientation[0]) + 360f) % 360f;
-        MainActivity.setMyRotationTextView("Aktualna orientacja " + this.orientation);
+        MainActivity.setMyRotationTextView("Aktualna orientacja " + String.format("%.0f%n", this.orientation));
     }
 
     @Override
